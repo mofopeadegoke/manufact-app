@@ -56,6 +56,13 @@ export const listApplications = server.tool(
       "List every job application with its id, status and dates. Applications due for follow-up come first and are flagged.",
     inputSchema: noInput,
     outputSchema: applicationListOutput,
+    view: {
+      name: "pipeline",
+      description:
+        "Interactive table of job applications with status editing, delete and follow-up drafting",
+      // The View draws its own border so it looks the same in every host.
+      prefersBorder: false,
+    },
     annotations: {
       readOnlyHint: true,
       destructiveHint: false,

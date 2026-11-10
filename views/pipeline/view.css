@@ -1,0 +1,246 @@
+.tracker {
+  --bg: #ffffff;
+  --text: #1c1c1a;
+  --muted: #5f5e58;
+  --line: #dcdad2;
+  --control-bg: #ffffff;
+  --control-line: #8a887f;
+  --focus: #1a56c4;
+  --due-bg: #fdf3d6;
+  --due-text: #6b4300;
+  --due-line: #b87400;
+  --danger: #a3261c;
+  --error-bg: #fbe9e7;
+
+  box-sizing: border-box;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    14px/1.45 system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  container-type: inline-size;
+}
+
+.tracker[data-theme="dark"] {
+  --bg: #1b1b19;
+  --text: #ecebe6;
+  --muted: #a9a79e;
+  --line: #3a3934;
+  --control-bg: #262623;
+  --control-line: #77756c;
+  --focus: #8ab4ff;
+  --due-bg: #3a2c08;
+  --due-text: #ffd98a;
+  --due-line: #e0a52e;
+  --danger: #ff9a8f;
+  --error-bg: #40201c;
+}
+
+.tracker *,
+.tracker *::before {
+  box-sizing: border-box;
+}
+
+.tracker-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  margin-bottom: 12px;
+}
+
+.tracker-header h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.tracker-header p {
+  margin: 0;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.tracker-notice {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.tracker-notice[data-kind="error"] {
+  border-color: var(--danger);
+  background: var(--error-bg);
+}
+
+.tracker-empty {
+  margin: 0;
+  padding: 24px 0;
+  color: var(--muted);
+  text-align: center;
+}
+
+.tracker-muted {
+  color: var(--muted);
+}
+
+.tracker-footnote {
+  margin: 12px 0 0;
+}
+
+.tracker-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.tracker-table th,
+.tracker-table td {
+  padding: 10px 12px 10px 0;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  font-weight: 400;
+}
+
+.tracker-table thead th {
+  padding-top: 0;
+  border-top: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tracker-table tbody th {
+  font-weight: 600;
+}
+
+/* A due row is marked three ways so it never depends on colour: a thicker
+   left edge, a tinted background, and the "Due"/"Overdue" text itself. */
+.tracker-table tr[data-due="true"] > :first-child {
+  padding-left: 10px;
+  box-shadow: inset 4px 0 0 var(--due-line);
+}
+
+.tracker-table tr[data-due="true"] > * {
+  background: var(--due-bg);
+}
+
+.tracker time {
+  white-space: nowrap;
+}
+
+.tracker-due {
+  display: block;
+  color: var(--due-text);
+  font-weight: 600;
+}
+
+.tracker-table tr[aria-busy="true"] {
+  opacity: 0.6;
+}
+
+.tracker a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tracker-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.tracker button,
+.tracker select {
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--control-line);
+  border-radius: 6px;
+  background: var(--control-bg);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.tracker button:disabled,
+.tracker select:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.tracker button.tracker-danger {
+  border-color: var(--danger);
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.tracker a:focus-visible,
+.tracker button:focus-visible,
+.tracker select:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Below this width six columns no longer fit, so each application
+   becomes a labelled card instead of a row that scrolls sideways. */
+@container (max-width: 640px) {
+  .tracker-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .tracker-table,
+  .tracker-table tbody,
+  .tracker-table tr,
+  .tracker-table th,
+  .tracker-table td {
+    display: block;
+  }
+
+  .tracker-table tr {
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+
+  .tracker-table tr[data-due="true"] {
+    border-left: 4px solid var(--due-line);
+    background: var(--due-bg);
+  }
+
+  .tracker-table tr[data-due="true"] > :first-child {
+    padding-left: 0;
+    box-shadow: none;
+  }
+
+  .tracker-table tbody th,
+  .tracker-table td {
+    display: grid;
+    grid-template-columns: 6.5em 1fr;
+    gap: 8px;
+    padding: 4px 0;
+    border-top: 0;
+  }
+
+  .tracker-table tbody th::before,
+  .tracker-table td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+  }
+}
