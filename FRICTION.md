@@ -30,3 +30,10 @@ Severity: **blocker** / **annoying** / **minor**.
 | 16 | Use `<ModelContext>` in a View and preview it locally | The dev log prints `[ModelContext] Host does not declare the updateModelContext capability` twice per render under the screenshot host. Fine as a warning, but nothing in the Views docs says which hosts support it | A support note per host (Inspector, Claude, ChatGPT) next to `ModelContext` in the docs | minor |
 | 17 | Test a `useSendFollowUp` button in the Inspector's tool preview | The button never appears: the docs say to hide it unless `hostCapabilities.message` is defined, and neither the Inspector's tool preview, the Inspector's Chat tab, nor the `mcp-use screenshot` host defines it. The Chat tab is the surprising one, since a conversation is attached there. The docs do not say which Inspector surface, if any, supports follow-up messages | A note in the Views docs on where follow-up messages can be tested locally, or a toggle in the Inspector's debug controls to simulate the capability | annoying |
 | 11 | Set scripts with `pnpm pkg set scripts.test:watch=...` | Not an mcp-use issue: pnpm 12 rejects `:` in a property path. Edited `package.json` by hand | n/a (pnpm) | minor |
+
+## Step 5: deploy and real client
+
+| # | Trying to do | What happened | Expected | Severity |
+| - | - | - | - | - |
+| 18 | Deploy a private GitHub repo (the open question from #3) | It worked first time once the GitHub App was installed on that one repo. Good result; the docs still never say private repos are supported | The sentence in the docs | minor |
+| 19 | Deploy with `mcp-use deploy --name application-tracker` and get a recognisable address | The server is named `application-tracker` in the dashboard, but the public URL is a random slug: `https://fast-steel-8vnyl.run.mcp-use.com/mcp` | The name to shape the URL, or the help text for `--name` to say it does not | minor |
