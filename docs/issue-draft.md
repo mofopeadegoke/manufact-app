@@ -71,12 +71,12 @@ Either of these would fix the first run:
 
 **Screenshots**
 
-![alt text](image.png)
+[On GitHub: delete this line and paste or drag the screenshot file here. A link to a local file won't work.]
 
 **Desktop (please complete the following information):**
  - OS: Windows 11
  - Browser: Chrome
- - Version: `mcp-use` 2.12.3, `create-mcp-use-app` 2.1.1, Inspector 20.3.28, Node 26.13.0, pnpm 12.18.0
+ - Version: `mcp-use` 2.12.3, `create-mcp-use-app` 2.1.1, hosted Inspector v20.3.27 (local Inspector 20.3.28), Node 26.13.0, pnpm 12.18.0
 
 **Additional context**
 
