@@ -6,18 +6,20 @@
     "node": ">=22.22.2"
   },
   "version": "1.0.0",
-  "description": "an mcp-use server with React views for MCP Apps",
-  "author": "mcp-use",
+  "description": "MCP App that shows a job-application pipeline as an interactive table in Claude. Demo with fictional data.",
+  "author": "Adegoke Mofopefoluwa Daniel",
   "license": "MIT",
-  "homepage": "https://github.com/mcp-use/mcp-use",
+  "homepage": "https://github.com/mofopeadegoke/manufact-app#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mofopeadegoke/manufact-app.git"
+  },
   "keywords": [
     "mcp",
-    "mcp-server",
-    "chatgpt plugins",
-    "claude connector",
     "mcp-app",
     "mcp-use",
-    "manufact"
+    "claude-connector",
+    "job-applications"
   ],
   "scripts": {
     "build": "mcp-use build",

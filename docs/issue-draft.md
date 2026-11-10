@@ -80,11 +80,13 @@ Either of these would fix the first run:
 
 **Additional context**
 
-What I think is going on. I confirmed the first two points and am guessing at the third:
+Why it fails: with default settings, both of the hosted Inspector's connection paths are closed to a local server, each for a good reason.
 
-- `getInstallTargets` builds the Inspector link from a fixed origin (`MANUFACT_INSPECTOR_ORIGIN = "https://inspector.manufact.com"` in `src/install-targets.ts`), whatever the server's own URL is.
-- The dev server answers the cross-origin preflight with 405 and no CORS headers, so the browser blocks the hosted page from calling `localhost` directly.
-- My guess is that the Inspector then falls back to its server-side proxy, which refuses loopback targets (#2134), and that this refusal is where the 403 and the "Version negotiation failed" wording come from. I have not verified this part.
+- The landing page always links to the hosted Inspector. `getInstallTargets` builds the link from a fixed origin, whatever the server's URL is ([`install-targets.ts` L178–189](https://github.com/mcp-use/mcp-use/blob/main/libraries/typescript/packages/server/src/install-targets.ts#L178-L189), unchanged on `main` and `canary`).
+- **Direct** can't work: `MCPServer` serves no CORS headers unless `cors` is set ("Off when omitted", `ServerConfig.cors`), so the preflight gets a 405 and the browser blocks the request.
+- **Via Proxy** can't work: since #2134 the hosted Inspector's proxy refuses loopback targets, which returns 403. Auto mode tries Direct, then falls back to the proxy (per the Connection settings docs), which is why the user sees a 403. I haven't seen the hosted proxy's response myself; this part comes from the docs and #2134, not from my own testing.
+
+So I don't think either safety default should change. The problem is that the landing page sends local users down a path that can't succeed, and the error doesn't tell them why.
 
 I searched open and closed issues and pull requests for "Open in Inspector", "Version negotiation failed", "inspector localhost 403" and `getManufactInspectorUrl` and did not find this reported or being worked on.
 
