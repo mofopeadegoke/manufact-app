@@ -1,0 +1,69 @@
+[
+  {
+    "company": "Acme Robotics",
+    "role": "Software Engineer",
+    "link": "https://example.com/jobs/acme-robotics-software-engineer",
+    "status": "applied",
+    "appliedDaysAgo": 12,
+    "followUpInDays": -2
+  },
+  {
+    "company": "Globex Systems",
+    "role": "Full-Stack Engineer",
+    "link": "https://example.com/jobs/globex-systems-full-stack",
+    "status": "applied",
+    "appliedDaysAgo": 15,
+    "followUpInDays": -5
+  },
+  {
+    "company": "Larkspur Analytics",
+    "role": "Frontend Engineer",
+    "link": "https://example.com/jobs/larkspur-frontend",
+    "status": "interviewing",
+    "appliedDaysAgo": 21,
+    "followUpInDays": 0
+  },
+  {
+    "company": "Pinecrest Software",
+    "role": "Backend Engineer",
+    "status": "applied",
+    "appliedDaysAgo": 4,
+    "followUpInDays": 6
+  },
+  {
+    "company": "Bluefinch Labs",
+    "role": "Developer Experience Engineer",
+    "link": "https://example.com/jobs/bluefinch-devex",
+    "status": "interviewing",
+    "appliedDaysAgo": 18,
+    "followUpInDays": 3
+  },
+  {
+    "company": "Tidewater Health",
+    "role": "Platform Engineer",
+    "link": "https://example.com/jobs/tidewater-platform",
+    "status": "rejected",
+    "appliedDaysAgo": 30
+  },
+  {
+    "company": "Quillon Games",
+    "role": "Tools Engineer",
+    "status": "rejected",
+    "appliedDaysAgo": 26
+  },
+  {
+    "company": "Ostrava Cloud",
+    "role": "Product Engineer",
+    "link": "https://example.com/jobs/ostrava-product-engineer",
+    "status": "offer",
+    "appliedDaysAgo": 35
+  },
+  {
+    "company": "Marlowe & Finch",
+    "role": "Founding Engineer",
+    "link": "https://example.com/jobs/marlowe-finch-founding-engineer",
+    "status": "applied",
+    "appliedDaysAgo": 1,
+    "followUpInDays": 9
+  }
+]
