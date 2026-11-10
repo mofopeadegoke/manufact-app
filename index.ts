@@ -62,6 +62,17 @@ export const listApplications = server.tool(
         "Interactive table of job applications with status editing, delete and follow-up drafting",
       // The View draws its own border so it looks the same in every host.
       prefersBorder: false,
+      // ChatGPT requires one HTTPS origin for the View. This is the deployed
+      // server's own origin; on Claude the SDK replaces it with a hash of the
+      // MCP endpoint, so this does not change how Claude renders the View.
+      domain: "https://fast-steel-8vnyl.run.mcp-use.com",
+    },
+    // mcp-use 2.12 has no typed field for this, so it goes in raw tool _meta.
+    _meta: {
+      "openai/toolInvocation": {
+        invoking: "Loading applications…",
+        invoked: "Loaded applications",
+      },
     },
     annotations: {
       readOnlyHint: true,
