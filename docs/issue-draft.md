@@ -71,7 +71,7 @@ Either of these would fix the first run:
 
 **Screenshots**
 
-[Attach a screenshot of the hosted Inspector showing the 403 error.]
+![alt text](image.png)
 
 **Desktop (please complete the following information):**
  - OS: Windows 11
