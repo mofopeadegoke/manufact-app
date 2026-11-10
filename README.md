@@ -100,4 +100,4 @@ The full list, with what I expected in each case, is in [FRICTION.md](FRICTION.m
 - **There is no path for testing.** The scaffold has no test runner and the docs have no recipe for testing a tool handler. Separating handlers from `server.tool` worked well, and one example test in the template would have saved the guesswork.
 - **A View's follow-up button cannot be tested locally.** The docs say to hide a `useSendFollowUp` control unless the host declares the `message` capability, and neither the Inspector's tool preview nor its Chat tab declares it. The docs also have no table of which hosts render Views at all: Gemini ran the tools but drew its own table.
 
-What worked well: the scaffold ran first time, schema validation errors were readable without any work from me, the typed hooks caught a wrong tool name at compile time, and the deploy from a private GitHub repo succeeded on the first attempt.
+What worked well: the scaffold ran first time, schema validation errors were readable without any work from me, the View hooks were typed from the server's tool exports with no extra setup, and the deploy from a private GitHub repo succeeded on the first attempt.
