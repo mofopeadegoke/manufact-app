@@ -1,14 +1,36 @@
 import { MCPServer } from "mcp-use";
-import { z } from "zod";
+import { todayUtc } from "./src/dates.js";
+import {
+  addApplicationHandler,
+  deleteApplicationHandler,
+  draftFollowUpHandler,
+  followUpsDueHandler,
+  listApplicationsHandler,
+  updateApplicationHandler,
+  type AppStore,
+  type HandlerContext,
+} from "./src/handlers.js";
+import {
+  addApplicationInput,
+  applicationChangeOutput,
+  applicationListOutput,
+  deleteApplicationOutput,
+  draftFollowUpOutput,
+  idInput,
+  noInput,
+  updateApplicationInput,
+} from "./src/schemas.js";
+import { loadSeed } from "./src/seed.js";
+import { createState } from "./src/store.js";
 
 const server = new MCPServer({
-  name: "tracker",
-  title: "tracker", // Human readable name of the server
+  name: "application-tracker",
+  title: "Application Tracker",
   version: "1.0.0",
-  description: "an mcp-use app",
-  instructions: "use show-app to open the app view", // Model-facing guidance — surfaced to the LLM by compatible clients.
-  websiteUrl: "https://mcp-use.com",
-  // Icons for your MCP Server, from public/ (or absolute URLs).
+  description:
+    "Tracks a job-application pipeline and which follow-ups are due. Demo with fictional data.",
+  instructions:
+    "Applications are identified by id (e.g. app-3). Call list_applications first to find the id for a company. Dates are YYYY-MM-DD. To write a follow-up email, call draft_followup and write the email yourself from what it returns.",
   icons: [
     {
       src: "icon.svg",
@@ -16,102 +38,116 @@ const server = new MCPServer({
       sizes: ["512x512"],
     },
   ],
-
-  // The MCP server is by default served at /mcp, to customise
-  // basePath: "/mcp",
-
-  // mcp-use has 1 line adapter for OAuth, import from mcp-use/oauth/*
-  // oauth: oauthClerkProvider(), // zero-config via MCP_USE_OAUTH_CLERK_FRONTEND_API_URL, import from mcp-use/oauth/*
-
-  // When OAuth is on, the HTML landing page (/mcp) is protected by default, set to true to keep the landing page public while /mcp stays bearer-protected.
-  // publicLandingPage: true,
 });
 
-// TOOLS
+// mcp-use advises against module-level state because it is lost on restart
+// and not shared between instances. That is the accepted trade-off here:
+// the project is a demo whose data is meant to reset.
+const store: AppStore = { state: createState(loadSeed(todayUtc())) };
 
-// tool inputs are zod schemas. Important: set decriptions for the model to understand the input.
-const showAppInputSchema = z.object({
-  appName: z
-    .string()
-    .optional()
-    .describe(
-      "Optional title shown in the MCP App card instead of the default"
-    ),
-});
+// Built per call so "today" is correct on a server that runs past midnight.
+const context = (): HandlerContext => ({ store, today: todayUtc() });
 
-// tool outputs are zod schemas. Important: set descriptions for the model to understand the output.
-const showAppOutputSchema = z.object({
-  message: z.string().describe("Message to display in the MCP App"),
-});
-
-export const showApp = server.tool(
+export const listApplications = server.tool(
   {
-    name: "show-app", // Unique tool id on the wire.
-    title: "Show MCP App", // Short label in inspector and client UIs (falls back to name).
-    description: "Display the MCP App starter view", // LLM-facing summary of what the tool does.
-    inputSchema: showAppInputSchema, // Validated before the handler runs; .describe() text becomes LLM hints.
-    outputSchema: showAppOutputSchema, // Required when binding a view — the view reads structuredContent typed by this.
-    view: {
-      name: "my-view", // directory under views/
-      description: "MCP App starter card with interactive demo hooks",
-      prefersBorder: false, // ask the host to skip a card border around the view
-      csp: {
-        resourceDomains: [
-          "https://fonts.googleapis.com",
-          "https://fonts.gstatic.com",
-        ],
-      },
-    },
-    // Behavioral hints for clients (readOnly / destructive / open-world).
+    name: "list_applications",
+    title: "List applications",
+    description:
+      "List every job application with its id, status and dates. Applications due for follow-up come first and are flagged.",
+    inputSchema: noInput,
+    outputSchema: applicationListOutput,
     annotations: {
       readOnlyHint: true,
       destructiveHint: false,
       openWorldHint: false,
     },
   },
-  async ({ appName }, ctx) => {
-    // Brief delay so the pending skeleton is visible during dev/inspector demos.
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    console.log(`The app name was: ${appName}`);
-    const data = { message: `The MCP App starter for ${appName} is ready!` };
-
-    return {
-      content: [{ type: "text", text: data.message }],
-      structuredContent: data,
-    };
-  }
+  async () => listApplicationsHandler(context())
 );
 
-// say-hello — plain tool (no view); used by the Say Hello button in my-view
-const sayHelloInputSchema = z.object({
-  name: z.string().describe("Name to greet"),
-});
-
-const sayHelloOutputSchema = z.object({
-  greeting: z.string().describe("Greeting to display"),
-});
-
-export const sayHello = server.tool(
+export const followupsDue = server.tool(
   {
-    name: "say-hello",
-    title: "Say hello",
-    description: "Returns a greeting for the Say Hello button demo",
-    inputSchema: sayHelloInputSchema,
-    outputSchema: sayHelloOutputSchema,
+    name: "followups_due",
+    title: "Follow-ups due",
+    description:
+      "List only the applications whose follow-up date is today or earlier.",
+    inputSchema: noInput,
+    outputSchema: applicationListOutput,
     annotations: {
       readOnlyHint: true,
       destructiveHint: false,
       openWorldHint: false,
     },
   },
-  async ({ name }) => {
-    const data = { greeting: `Hello, ${name}!` };
-    return {
-      content: [{ type: "text", text: data.greeting }],
-      structuredContent: data,
-    };
-  }
+  async () => followUpsDueHandler(context())
+);
+
+export const addApplication = server.tool(
+  {
+    name: "add_application",
+    title: "Add application",
+    description:
+      "Add a job application with status applied. The follow-up date defaults to 10 days after the applied date.",
+    inputSchema: addApplicationInput,
+    outputSchema: applicationChangeOutput,
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
+  },
+  async (input) => addApplicationHandler(context(), input)
+);
+
+export const updateApplication = server.tool(
+  {
+    name: "update_application",
+    title: "Update application",
+    description:
+      "Change an application's status, follow-up date, link or role. Give the id and at least one field to change.",
+    inputSchema: updateApplicationInput,
+    outputSchema: applicationChangeOutput,
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
+  },
+  async (input) => updateApplicationHandler(context(), input)
+);
+
+export const deleteApplication = server.tool(
+  {
+    name: "delete_application",
+    title: "Delete application",
+    description:
+      "Permanently remove one application by id. Confirm with the user before calling.",
+    inputSchema: idInput,
+    outputSchema: deleteApplicationOutput,
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: true,
+      openWorldHint: false,
+    },
+  },
+  async (input) => deleteApplicationHandler(context(), input)
+);
+
+export const draftFollowup = server.tool(
+  {
+    name: "draft_followup",
+    title: "Draft follow-up",
+    description:
+      "Get one application's details and writing guidance so you can write the follow-up email. This tool does not write the email; you do.",
+    inputSchema: idInput,
+    outputSchema: draftFollowUpOutput,
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
+    },
+  },
+  async (input) => draftFollowUpHandler(context(), input)
 );
 
 export default server;
