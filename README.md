@@ -46,7 +46,7 @@ One View, bound to `list_applications`:
 
 - Due rows come first and are marked three ways (a thicker edge, a tint, and "Overdue by N days" text), so the signal never depends on colour.
 - Each row has a status dropdown and a Delete button with a confirmation step. Both call the tools directly and redraw from the server's answer.
-- "Draft follow-up" posts a message into the chat so the model writes the email. It appears only where the host accepts messages from a View.
+- "Draft follow-up" posts a message into the chat so the model writes the email. It shows in Claude; hosts that can't accept messages from a View (including the local Inspector) get a footnote telling you what to ask in chat instead.
 - Below 640px the table becomes labelled cards. Every control has a visible keyboard focus ring, and both light and dark themes are supported.
 
 A few rules worth knowing:
