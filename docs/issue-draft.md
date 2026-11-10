@@ -75,7 +75,7 @@ Either of these would fix the first run:
 
 **Desktop (please complete the following information):**
  - OS: Windows 11
- - Browser: [the browser you used]
+ - Browser: Chrome
  - Version: `mcp-use` 2.12.3, `create-mcp-use-app` 2.1.1, Inspector 20.3.28, Node 26.13.0, pnpm 12.18.0
 
 **Additional context**
