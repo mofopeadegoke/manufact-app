@@ -1,136 +1,86 @@
-# Application Tracker MCP App (built with mcp-use)
+# Testing the new mcp-use evals CLI (and contributing back)
 
-A small MCP App that shows a job-application pipeline as an interactive widget inside Claude or ChatGPT. Built with Manufact's open-source `mcp-use` TypeScript SDK and deployed on Manufact Cloud.
+We're trying Manufact's newest feature, `mcp-use evals` (released in mcp-use v2.12.9 / @mcp-use/cli v5.4.0), on my existing application-tracker MCP App, then turning what we learn into issues, a docs example or a PR on the mcp-use repo.
 
-**Purpose:** a job application to Manufact (founding software engineer). The point is to show I used their SDK for real, deployed it on their platform, and noticed where the developer experience can improve.
+**Why:** I already have 4 issues and 2 merged PRs on mcp-use. Evals are what Manufact is shipping right now, so honest feedback and fixes here are the most useful contribution I can make, and they keep me on the team's radar.
 
-**Time box: 3–4 hours total.** Tell me as soon as a step looks likely to run over. Do not cut or change scope yourself: tell me the options and I decide.
+**What the feature does:** eval suites live in YAML files, run on Manufact Cloud, and can gate CI. `run --wait` exits with code 1 unless every run passes, and `--markdown-file` writes a report for PR comments or CI job summaries.
 
 ## Rules
 
-- **Read the current mcp-use docs before writing any code.** The SDK changes fast. Do not rely on remembered APIs. Use the official quickstart and scaffolding command. If the docs and your memory disagree, the docs win.
-- **Scope is my decision.** Build only what's listed under Scope. If something seems missing or unnecessary, ask me before adding or removing it.
-- Use pnpm, not npm (if the scaffolder requires something else, tell me why).
-- TypeScript, strict mode.
+- **Read the current docs before running anything.** Start with the mcp-use CLI reference for `evals` and the eval suite YAML format, then the repo's CONTRIBUTING file. Don't rely on remembered commands, flags or YAML keys. If the docs and your memory disagree, the docs win.
+- **Scope is my decision.** Do only what's in the steps below. Ask me before adding or removing anything.
+- **Budget guard (important).** I'm on the Free plan: $5 a month, hard limit. An eval run costs about $0.70 and a checklist run about $0.90, so roughly 7 eval runs in total. **Ask me before every command that starts a cloud eval run or checklist run**, say how many runs you expect it to use, and log it in `RUNS.md` afterwards. Anything that runs locally or only reads (validate, list, get, export, options, models) is fine without asking.
+- Use pnpm, not npm (if a tool requires something else, tell me why).
 - Comments only explain *why*, never *what*.
 - When you create or replace a file, show me the full file.
-- One step at a time. After each step, stop, summarize in two or three sentences, give me a short test checklist, and wait for "next".
-- **Fake data only.** Seed with a fictional person (Jane Doe) and fictional companies. Never read, import or reference any real applications log or personal data.
-- No Manufact branding, logos or styling in the widget.
-- Keep `FRICTION.md` from the first minute (see below).
+- One step at a time. After each step, stop, summarise in two or three sentences, give me a short test checklist, and wait for "next".
+- **Fake data only.** The tracker uses fictional Jane Doe data. Never use my real applications log.
+- **Never post anything publicly** (issues, PRs, comments). Draft them and show me. I post them myself.
+- **Secrets** (Manufact API keys, tokens) go in gitignored env files or GitHub Actions secrets. Never commit them or print them.
+- Keep `FRICTION.md` and `RUNS.md` from the first command.
 
-## Scope
+## FRICTION.md
 
-### In
-- **Tools:**
-  - `list_applications`: all applications, with which ones are due for follow-up.
-  - `followups_due`: applications whose follow-up date is today or earlier.
-  - `add_application`: company, role, link, applied date; follow-up date defaults to applied + 10 days.
-  - `update_application`: change status, follow-up date, link or role.
-  - `delete_application`: remove one by id.
-  - `draft_followup`: returns the application's details (company, role, applied date, days since applying, status) plus short writing guidance, so **the model in Claude or ChatGPT writes the email**. No LLM call or API key on the server.
-- **Widget:** a pipeline table (company, role, status, applied, follow-up), due rows first and clearly marked (not by colour alone). From the widget I can edit status, delete a row (with a confirmation step), and ask for a follow-up draft. Use the widget-to-tool pattern the docs recommend.
-- **Data:** in-memory store seeded from a JSON file with 8–10 fictional rows (mix of applied, interviewing, rejected, offer). Data resets on restart, which is fine.
-- **Automated tests** (Vitest unless the scaffold already uses another runner):
-  - the pure date logic (`isFollowUpDue`, default follow-up date)
-  - each tool handler: valid input, invalid input, unknown id
-  - widget tests only if the docs show a straightforward way; otherwise ask me
-- Deployed on Manufact Cloud and tested in at least one real client (Claude or ChatGPT) plus their Inspector.
-- README.
-
-### Out
-- A persistent database.
-- Anything not listed under "In": ask me first.
-
-## Data shape
-
-```ts
-type Status = "applied" | "interviewing" | "rejected" | "offer";
-
-type Application = {
-  id: string;
-  company: string;
-  role: string;
-  link?: string;
-  status: Status;
-  appliedOn: string;     // ISO date
-  followUpOn?: string;   // ISO date; none for rejected/offer
-};
-```
-
-Keep date logic and store operations in pure functions, separate from the MCP tool wiring, so they're easy to test.
-
-## FRICTION.md (important)
-
-From the very first command, log anything that slowed me down: confusing docs, unclear errors, missing examples, Inspector or deploy issues, anything that didn't match the docs. One line each, with:
+Log anything that slowed me down. One entry each:
 
 - what I was trying to do
-- what happened
+- what happened (exact error text if any)
 - what I expected
+- tag: `docs` / `cli` / `bug` / `ux`
 - severity: blocker / annoying / minor
 
-This file is where the contribution comes from. Don't silently work around a problem: log it first.
+Don't work around a problem silently: log it first.
+
+## RUNS.md
+
+One line per cloud run: date, exact command (no secrets), runs used (check the dashboard's usage), estimated cost, result, and remaining allowance.
 
 ## Steps
 
-### Step 1: Scaffold and run (≈20 min)
-Read the quickstart. Scaffold a TypeScript MCP App with the official command. Run it locally and open it in the Inspector. Set up the test runner. Start `FRICTION.md`.
+### Step 1: Read and set up (no cost)
+- Read the evals CLI docs, the YAML suite format and CONTRIBUTING.
+- Check the tracker app is deployed on Manufact Cloud and still works.
+- Update `@mcp-use/cli` to a version that includes `evals` and log in.
+- Run the read-only commands (`evals options`, `evals models`, `evals list`) to see what's available.
+- Start `FRICTION.md` and `RUNS.md`.
 
-Test: the starter tool/widget works in the Inspector; `pnpm test` runs.
+Test: CLI is updated and logged in; I know the YAML format in two or three bullets; I know which clients and models I can pick.
 
-### Step 2: Data, store and tests (≈35 min)
-Seed JSON, the `Application` type, pure store functions (list, add, update, delete) and date logic, with their tests written alongside.
+### Step 2: Write the smallest useful suite (no cost)
+- Write one suite in `evals/` with one or two steps, one client and one model. For example: "ask which applications are due for a follow-up" and check the right tool is called.
+- Validate it locally using whatever the docs say validates without starting a run. If nothing validates without pushing, tell me before pushing.
+- Log anything confusing about the YAML format (missing schema, unclear keys, unhelpful validation errors).
 
-Test: `pnpm test` passes; tests cover due/not-due edge cases (today, yesterday, no follow-up date) and unknown ids.
+Test: the file validates; I can explain every key in it.
 
-### Step 3: Tools (≈40 min)
-Wire up all six tools with input validation the way the SDK docs recommend. Add tool handler tests.
+### Step 3: First cloud run (about 1 run, ask first)
+- `push` the suite, then one `run --wait` with `--json-file` and `--markdown-file`.
+- Afterwards, check the dashboard to find out exactly how many runs were used. This tells us whether a "run" is a whole suite or one client-and-model pair.
+- Try the read-only commands on the result: `runs`, `report`, `get`, `export`.
 
-Test: in the Inspector, each tool works; invalid input gives a clear error; `draft_followup` returns details the model can write from; `pnpm test` passes.
+Test: the run finishes; the Markdown report is readable; `RUNS.md` shows the real usage.
 
-### Step 4: Widget (≈50 min)
-Pipeline table with due rows first. Edit status, delete with confirmation, and "Draft follow-up" actions that call the tools. Readable at narrow widths, visible keyboard focus.
+### Step 4: GitHub Actions gate (1 to 2 runs, ask first)
+- Add a workflow that runs the suite with `--wait` and writes the Markdown report to the job summary.
+- **Trigger it manually only** (`workflow_dispatch`) so it can't burn the allowance on every push.
+- Run it once passing. If budget allows and I agree, run it once with a deliberately failing step to confirm the job fails.
 
-Test: in the Inspector's widget preview, editing, deleting and drafting work and the table updates.
+Test: the job passes and shows the report; a failing eval fails the job (if we ran that check).
 
-### Step 5: Deploy and try it in a real client (≈30 min)
-Deploy to Manufact Cloud the way the docs recommend. Connect it to Claude or ChatGPT. Try: "what follow-ups are due?", "mark Acme as interviewing", "draft a follow-up for Globex".
+### Step 5: Turn friction into contributions (no cost)
+- Sort `FRICTION.md`. Pick the one to three most useful items.
+- Search mcp-use's GitHub issues for duplicates first.
+- Draft clear issues with reproduction steps. For anything genuinely small, draft a PR, following CONTRIBUTING.
+- If the YAML format was hard to learn, draft a short docs example: "gate your MCP server's CI on evals," using my workflow as the basis. Ask the maintainers first whether they want it before writing a PR for it.
+- Show me every draft before anything is posted.
 
-Test: the widget and all actions work in the real client. Note the deployed URL.
-
-### Step 6: README and contribution (≈30 min)
-- README: what it is, example prompts, the deployed URL, a screenshot, "fake data only", how to run the tests, and a short "What I noticed" section summarizing `FRICTION.md` in two or three bullets.
-- Pick the most useful, smallest item from `FRICTION.md`. Check the mcp-use GitHub repo for an existing issue first. Then draft either a GitHub issue with clear reproduction steps, or a small PR if it's genuinely quick.
-- Show me the draft before anything is posted. I post it myself.
-
-Test: README reads clearly to a stranger; the issue/PR draft is specific, reproducible and polite.
-
-## Decisions (planning session, 2026-11-10)
-
-Agreed before Step 1. These refine the sections above; where they differ, these win.
-
-- **SDK version:** mcp-use v2 (2.12.x). v2 calls widgets **Views** (`views/<name>/view.tsx`, `useToolContext`, `useCallTool`, `useSendFollowUp`). Anything using `resources/`, `useWidget` or `mcp-use/server` is v1 and wrong.
-- **Working style:** each step ends with a short "how this works in mcp-use" explanation as well as the summary and test checklist. Claude commits locally per step; I push.
-- **Sittings:** two. Steps 1–3, then Steps 4–6. Planning time is outside the 3–4 hours.
-- **Scaffold:** `mcp-apps` template via pnpm, moved into the repo root, bundled agent skill kept.
-- **Seed data:** the seed JSON stores day offsets (e.g. `appliedDaysAgo`), converted to ISO dates at server start, so the demo always has a mix of due and not-due rows. The `Application` type is unchanged.
-- **Dates:** strict `YYYY-MM-DD`. "Today" is the server's UTC date; pure functions take `today` as a parameter.
-- **Follow-up rules:** moving to `rejected` or `offer` clears `followUpOn`. Moving back leaves it empty. Setting a follow-up date on a rejected/offer row is an error.
-- **Validation:** `link` must be http(s). Duplicate company + role allowed. `followUpOn` before `appliedOn` rejected. An update with no fields is an error.
-- **Ids:** short readable ids (`app-1`). Tools take an id only; the model finds it via `list_applications`.
-- **Tool names:** snake_case as listed under Scope, unless the SDK rejects them.
-- **View:** bound to `list_applications` only (one View binds to one tool). `followups_due` returns text and data only. Edit status and delete call tools directly. "Draft follow-up" sends a message into the chat so the model writes the email; the button is hidden if the host cannot accept messages. No template branding in the View; the default landing page stays.
-- **Tests:** Vitest. Tool handlers are plain functions separate from `server.tool` registration and are tested directly. No View unit tests; verify in the Inspector and use `mcp-use screenshot` for the README.
-- **Deploy:** Manufact Cloud free tier via the GitHub integration; `--no-github` local upload is the fallback. Use `pnpm run deploy`, never `pnpm deploy`.
-- **Shared store:** the deployed store is public, shared, and resets on idle (scale to zero) and on deploy. Accepted; one line in the README. No reset tool.
-- **Client:** Claude first (custom connectors work on every plan; Free allows one). ChatGPT only if time is left.
-- **Repo:** private during the build, made public at the end.
+Test: each draft is specific, reproducible, polite and follows their contribution rules.
 
 ## Done when
 
-- [ ] All six tools and the widget work, fake data only
-- [ ] `pnpm test` passes
-- [ ] Deployed on Manufact Cloud and working in a real client
-- [ ] `FRICTION.md` has honest notes from the whole build
-- [ ] README with deployed URL, screenshot and "What I noticed"
-- [ ] One issue or PR drafted for me to post
+- [ ] One eval suite runs on Manufact Cloud for my tracker app
+- [ ] A manually triggered GitHub Actions workflow gates on it and shows the report
+- [ ] `RUNS.md` shows every cloud run and we stayed within the Free allowance
+- [ ] `FRICTION.md` has honest, tagged notes
+- [ ] One to three issues, a PR or a docs example drafted for me to post

@@ -1,5 +1,20 @@
 # FRICTION.md
 
+## Evals (started 2026-11-21)
+
+Trying `mcp-use evals` on the tracker. Versions: `mcp-use` 2.12.9, `@mcp-use/cli` 5.4.0, pnpm 12.18.0, Windows 11. Tags: `docs` / `cli` / `bug` / `ux`. Numbered E1, E2, … in log order.
+
+| # | Step | Trying to do | What happened | Expected | Tag | Severity |
+| - | - | - | - | - | - | - |
+| E1 | 1 | Find the evals docs and the suite YAML format | There is no evals page and no entry in the docs index (`docs.mcp-use.com/llms.txt`). Evals is one section of the CLI Reference, and the whole YAML format is one commented example (`evals/weather.yaml`). There is no table of keys, no list of `args` matchers besides `contains`, no list of step kinds, and no default for `enabled` | A dedicated evals page with a key-by-key table of the suite format | docs | annoying |
+| E2 | 1 | Find a way to validate a suite file before it reaches Cloud | The CLI Reference says "The CLI validates each file locally, like `alerts`", but there is no `evals validate` and no `--dry-run` on `push` or `create` (checked `--help` for both). Local validation only happens inside `push`, which then writes the suite to Cloud. No JSON schema for editor checking either | `mcp-use evals validate <path>` or `push --dry-run`, plus a published JSON schema | cli | annoying |
+| E3 | 1 | Choose clients, starting from the docs example | The example uses `claude: true` and `chatgpt: { models: [...] }`. `evals options` reports both as "Unavailable: The claude.ai plugin lifecycle is part of native app evals, enabled per organization on request." The docs never say these clients are gated | A note next to the example: web-app clients need to be enabled per organization, so start with `inspector` or `runtimes` | docs | annoying |
+| E4 | 1 | Work out which model ID format to use | `evals options` lists model IDs under the Claude web app (`claude-opus-5-5`), but the docs schema only shows `claude: true`, with no `models` field. Harness IDs use a different format for the same model (`anthropic/claude-opus-5.5`) | One ID format across clients, or the docs showing which format each client key takes | ux | minor |
+| E5 | 1 | Run `mcp-use evals --help` on the CLI pinned by `mcp-use` 2.12.3 (`@mcp-use/cli` 5.0.0) | It printed the top-level usage and exited 255, with no "unknown command" message and no hint that `evals` needs a newer CLI | `Unknown command "evals". It was added in @mcp-use/cli 5.4.0; upgrade mcp-use to 2.12.9 or later` | cli | minor |
+| E6 | 1 | Learn how to authenticate the CI example | The only CI snippet (`mcp-use evals push evals/ && mcp-use evals run --all --wait`) shows no credential. The API key variable, `MANUFACT_TOKEN` (`MCP_USE_API_KEY` is the legacy name), is described in a separate "Cloud command conventions" section | The CI snippet to set `MANUFACT_TOKEN` from a secret | docs | minor |
+
+## Build (2026-11-10 to 2026-11-16)
+
 Honest notes on anything that slowed the build down. Versions: `mcp-use` 2.12.3, `create-mcp-use-app` 2.1.1, `@mcp-use/client` 2.4.5, pnpm 12.18.0, Node 26.13.0, Windows 11.
 
 Severity: **blocker** / **annoying** / **minor**. Sorted most urgent first. Numbers are the original log order. Items already drafted as an issue or PR (#10, #12) are in `docs/` and no longer listed here.
