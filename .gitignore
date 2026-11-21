@@ -42,3 +42,6 @@ Thumbs.db
 *.swo
 *~
 
+
+# Eval run reports (may include tool output)
+evals/out/
