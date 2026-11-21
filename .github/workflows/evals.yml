@@ -7,7 +7,7 @@ on:
 permissions:
   contents: read
 
-# Two dispatches at once would spend two runs for one answer.
+# Never cancel: a cancelled run is still billed once any execution has finished.
 concurrency:
   group: evals
   cancel-in-progress: false
@@ -17,9 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      MANUFACT_TOKEN: ${{ secrets.MANUFACT_TOKEN }}
-      # The CLI gitignores its own project link, so CI has to name the server.
-      MANUFACT_SERVER: 0b0f4785-4c21-43ff-b73f-01c22dac2ac3
+      # Not a secret; the CLI gitignores its project link, so CI has to name the server.
+      SERVER_ID: 0b0f4785-4c21-43ff-b73f-01c22dac2ac3
     steps:
       - uses: actions/checkout@v5
 
@@ -32,20 +31,17 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Push suites
+      # The action only runs suites, so the repo's files have to reach Cloud first.
+      - name: Push eval suites
         run: pnpm exec mcp-use evals push evals/
+        env:
+          MANUFACT_TOKEN: ${{ secrets.MANUFACT_TOKEN }}
+          MANUFACT_SERVER: ${{ env.SERVER_ID }}
 
-      - name: Run suites
-        run: >-
-          pnpm exec mcp-use evals run evals/ --wait --timeout 900
-          --json-file evals/out/run.json --markdown-file evals/out/run.md
-
-      # Runs after a failed gate too, because that is when the report matters most.
-      - name: Write report to job summary
-        if: always()
-        run: |
-          if [ -f evals/out/run.md ]; then
-            cat evals/out/run.md >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "No eval report was written; see the Run suites step log." >> "$GITHUB_STEP_SUMMARY"
-          fi
+      # Pinned to the commit behind the v1 tag so the gate cannot change without a commit here.
+      - uses: mcp-use/evals@b686cff9110b56173054255598d5431b978e1e27 # v1
+        with:
+          token: ${{ secrets.MANUFACT_TOKEN }}
+          server: ${{ env.SERVER_ID }}
+          suites: evals/
+          timeout: "900"
