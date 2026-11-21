@@ -1,0 +1,51 @@
+name: Evals
+
+# Manual only: each run spends part of a small Free-plan allowance.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Two dispatches at once would spend two runs for one answer.
+concurrency:
+  group: evals
+  cancel-in-progress: false
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      MANUFACT_TOKEN: ${{ secrets.MANUFACT_TOKEN }}
+      # The CLI gitignores its own project link, so CI has to name the server.
+      MANUFACT_SERVER: 0b0f4785-4c21-43ff-b73f-01c22dac2ac3
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Push suites
+        run: pnpm exec mcp-use evals push evals/
+
+      - name: Run suites
+        run: >-
+          pnpm exec mcp-use evals run evals/ --wait --timeout 900
+          --json-file evals/out/run.json --markdown-file evals/out/run.md
+
+      # Runs after a failed gate too, because that is when the report matters most.
+      - name: Write report to job summary
+        if: always()
+        run: |
+          if [ -f evals/out/run.md ]; then
+            cat evals/out/run.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No eval report was written; see the Run suites step log." >> "$GITHUB_STEP_SUMMARY"
+          fi
