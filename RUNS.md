@@ -4,4 +4,4 @@ Every cloud eval or checklist run, one line each. Free plan: $5 a month, hard li
 
 | Date | Command (no secrets) | Runs used | Est. cost | Result | Remaining allowance |
 | - | - | - | - | - | - |
-| 2026-11-21 | `mcp-use evals run evals/followups-due.yaml --wait --json-file evals/out/run.json --markdown-file evals/out/run.md` (1 suite, 1 Inspector model: `anthropic/claude-haiku-5.5`) | _pending dashboard check_ | ~$0.70 | Passed, 100%, run `3c8fad3c` | ~$3.30 (estimate) |
+| 2026-11-21 | `mcp-use evals run evals/followups-due.yaml --wait --json-file evals/out/run.json --markdown-file evals/out/run.md` (1 suite, 1 Inspector model: `anthropic/claude-haiku-5.5`) | 1 (dashboard) | $0.70 (dashboard) | Passed, 100%, run `3c8fad3c` | $3.30, so 4 eval runs |
