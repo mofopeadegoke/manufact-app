@@ -10,7 +10,7 @@ We're trying Manufact's newest feature, `mcp-use evals` (released in mcp-use v2.
 
 - **Read the current docs before running anything.** Start with the mcp-use CLI reference for `evals` and the eval suite YAML format, then the repo's CONTRIBUTING file. Don't rely on remembered commands, flags or YAML keys. If the docs and your memory disagree, the docs win.
 - **Scope is my decision.** Do only what's in the steps below. Ask me before adding or removing anything.
-- **Budget guard (important).** I'm on the Free plan: $5 a month, hard limit. An eval run costs about $0.70 and a checklist run about $0.90, so roughly 7 eval runs in total. **Ask me before every command that starts a cloud eval run or checklist run**, say how many runs you expect it to use, and log it in `RUNS.md` afterwards. Anything that runs locally or only reads (validate, list, get, export, options, models) is fine without asking.
+- **Budget guard (important).** I'm on the Free plan: $5 a month, hard limit, with **$4.00 left** at the start of this work (2026-11-21). An eval run costs about $0.70 and a checklist run about $0.90, so at most 5 eval runs. Plan: 1 run in Step 3, 1–2 in Step 4, 2 spare for retries; no checklist runs. **Ask me before every command that starts a cloud eval run or checklist run**, say how many runs you expect it to use, and log it in `RUNS.md` afterwards. Anything that runs locally or only reads (validate, list, get, export, options, models) is fine without asking.
 - Use pnpm, not npm (if a tool requires something else, tell me why).
 - Comments only explain *why*, never *what*.
 - When you create or replace a file, show me the full file.

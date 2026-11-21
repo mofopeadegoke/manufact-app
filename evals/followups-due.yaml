@@ -1,0 +1,22 @@
+name: Follow-ups due
+flow:
+  - kind: user
+    content: Which of my job applications are due for a follow-up?
+  # followups_due takes no arguments, so only the tool name is checked.
+  - kind: tool_call
+    name: followups_due
+  - kind: assistant_text
+    note: Names each due company and role from the tool result.
+# The deployed store is shared and resets on idle, so the rubric avoids naming specific companies.
+rubric: >-
+  Calls followups_due rather than list_applications, then names every
+  application the tool returned as due (company and role) without inventing
+  any, and does not change or delete anything.
+threshold: 0.7
+clients:
+  # One model keeps this to a single execution until we know how runs are billed.
+  inspector:
+    models: [anthropic/claude-haiku-5.5]
+# A read-only question must never mutate the shared demo store.
+disallowedTools: [add_application, update_application, delete_application]
+enabled: true
